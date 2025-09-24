@@ -1,4 +1,5 @@
 import React from "react";
+
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
@@ -6,6 +7,9 @@ import { FcGoogle } from "react-icons/fc";
 import {useNavigate} from 'react-router-dom'
 import axios from 'axios'
 import { serverUrl } from '../config.js'
+import {GoogleAuthProvider ,signInWithPopup} from 'firebase/auth'
+import { auth } from '../firebase.js'; // Adjust the path if your firebase config is elsewhere
+
 
 
 function SignUp() {
@@ -22,6 +26,13 @@ function SignUp() {
   const[email , setEmail] = useState("")
   const[password , setPassword] = useState("")
   const[mobile , setMobile] = useState("")
+
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider()
+    const result = await signInWithPopup(auth  , provider)
+    console.log(result);
+    
+  }
 
   const handleSignUp = async () => {
     try {
@@ -159,7 +170,7 @@ function SignUp() {
               <button
                 className="flex-1 border rounded-lg px-3 py-2 text-center font-medium transition-colors cursor-pointer"
                 onClick={() => setRole(r)}
-                key={r.id}
+                key={r}
                 style={
                   role == r
                     ? { backgroundColor: primaryColor, color: "white" }
@@ -180,14 +191,14 @@ function SignUp() {
           onClick={handleSignUp}
           
         >
-            signUp
+            Sign Up
           
         </button>
         {/* {err && <p className="text-red-500 text-center my-[10px]">*{err}</p>} */}
 
         <button
           className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition cursor-pointer duration-200 border-gray-400 hover:bg-gray-100"
-        //   onClick={handleGoogleAuth}
+          onClick={handleGoogleAuth}
         >
           <FcGoogle size={20} />
           <span>Sign up with Google</span>
