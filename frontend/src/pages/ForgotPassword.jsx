@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1);
-    const [otp,setOtp] = useState('')
+  const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -18,7 +18,10 @@ const ForgotPassword = () => {
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-8">
         <div className="flex gap-4 items-center mb-4">
           <IoIosArrowRoundBack
-          onClick={() => navigate('/signin')} className="text-[#ff4d2d] cursor-pointer" size={30} />
+            onClick={() => navigate("/signin")}
+            className="text-[#ff4d2d] cursor-pointer"
+            size={30}
+          />
           <h1 className="text-2xl font-bold text-center text-[#ff4d2d]">
             Forgot Password
           </h1>
@@ -61,7 +64,7 @@ const ForgotPassword = () => {
                 htmlFor="email"
                 className="block text-gray-700 font-medium mb-1"
               >
-                 OTP
+                OTP
               </label>
               <input
                 type="email"
@@ -90,7 +93,7 @@ const ForgotPassword = () => {
                 htmlFor="New Password"
                 className="block text-gray-700 font-medium mb-1"
               >
-                 New Password
+                New Password
               </label>
               <input
                 type="password"
@@ -101,12 +104,12 @@ const ForgotPassword = () => {
               />
             </div>
             {/* confirm password */}
-                <div className="mb-6">
+            <div className="mb-6">
               <label
                 htmlFor="Confirm Password"
                 className="block text-gray-700 font-medium mb-1"
               >
-                 Confirm Password
+                Confirm Password
               </label>
               <input
                 type="password"
@@ -126,8 +129,6 @@ const ForgotPassword = () => {
             </button>
           </div>
         )}
-
-        
       </div>
     </div>
   );
