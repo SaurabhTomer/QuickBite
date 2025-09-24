@@ -22,6 +22,7 @@ function SignIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
 
   const handleSignIn = async () => {
     try {
@@ -35,6 +36,7 @@ function SignIn() {
       );
       console.log(result);
     } catch (error) {
+      
       console.log(error);
     }
   };

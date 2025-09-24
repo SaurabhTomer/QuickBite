@@ -4,10 +4,12 @@ import { Route, Routes, Navigate } from 'react-router-dom'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import ForgotPassword from './pages/ForgotPassword'
+import { Toaster } from 'react-hot-toast'
 
 const App = () => {
   return (
     <div>
+      <Toaster position='top-center' reverseOrder={false}/>
       <Routes>
        <Route path='/' element={<Navigate to="/signup" replace />} />
        <Route path='/signup' element={<SignUp/>}/>

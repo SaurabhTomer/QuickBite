@@ -1,5 +1,5 @@
 import React from "react";
-
+import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
@@ -48,24 +48,29 @@ function SignUp() {
       
     } catch (error) {
        console.log(error);
+       
       
     }
     
   }
 
-  const handleSignUp = async () => {
-    try {
-        const result = await axios.post(`${serverUrl}/api/auth/signup` , {
-            fullName , email , password , mobile , role
-        } , {withCredentials:true})
-        console.log(result);
-        
-    } catch (error) {
-     console.log(error);
-      
-        
-    }
+ const handleSignUp = async () => {
+  try {
+    const result = await axios.post(
+      `${serverUrl}/api/auth/signup`,
+      { fullName, email, password, mobile, role },
+      { withCredentials: true }
+    );
+
+    console.log(result);
+    toast.success("SignUp successful!"); // show success toast
+  } catch (error) {
+   
+    toast.error("Fill correct details")
+   console.log(error);
+   
   }
+};
   
 
   return (
