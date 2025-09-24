@@ -6,7 +6,7 @@ export const signUp = async (req, res) => {
   try {
     const { fullName, email, password, mobile, role } = req.body;
 
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "user already exists." });
     }
@@ -16,7 +16,7 @@ export const signUp = async (req, res) => {
         .json({ message: "Password must be atleast 6 characters. " });
     }
 
-    if (mobile.length < 10 && mobile.length > 10) {
+    if (mobile.length < 10 || mobile.length > 10) {
       return res
         .status(400)
         .json({ message: "Mobile must be atleast 10 digits. " });
@@ -39,6 +39,8 @@ export const signUp = async (req, res) => {
         maxAge : 7 * 24 * 60 * 60 * 1000,
         httpOnly : true
     })
+    console.log({fullName,email,role,mobile,password});
+    
 
     return res.status(201).json(user)
   } catch (error) {
