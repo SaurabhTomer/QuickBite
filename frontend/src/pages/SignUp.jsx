@@ -26,11 +26,30 @@ function SignUp() {
   const[email , setEmail] = useState("")
   const[password , setPassword] = useState("")
   const[mobile , setMobile] = useState("")
+  const[seterr , setErr] = useState("")
+  
 
   const handleGoogleAuth = async () => {
+    if(!mobile){
+      return alert("mobile number is required")
+    }
     const provider = new GoogleAuthProvider()
     const result = await signInWithPopup(auth  , provider)
-    console.log(result);
+    
+    try {
+      const data = await axios.post(`${serverUrl}/api/auth/google-auth` , {
+        fullName : result.user.displayName,
+        email : result.user.email,
+        role ,
+        mobile 
+      } , {withCredentials:true})
+
+      console.log(data);
+      
+    } catch (error) {
+       console.log(error);
+      
+    }
     
   }
 
@@ -42,8 +61,8 @@ function SignUp() {
         console.log(result);
         
     } catch (error) {
-        console.log(error);
-        
+     console.log(error);
+      
         
     }
   }
@@ -87,6 +106,7 @@ function SignUp() {
             style={{ border: `1px solid ${borderColor}` }}
             onChange={(e) => setFullName(e.target.value)}
             value={fullName}
+            required
            
           />
         </div>
@@ -106,6 +126,7 @@ function SignUp() {
             style={{ border: `1px solid ${borderColor}` }}
              onChange={(e) => setEmail(e.target.value)}
             value={email}
+            required
             
           />
         </div>
@@ -125,6 +146,7 @@ function SignUp() {
             style={{ border: `1px solid ${borderColor}` }}
              onChange={(e) => setMobile(e.target.value)}
             value={mobile}
+            required
            
           />
         </div>
@@ -145,6 +167,7 @@ function SignUp() {
               style={{ border: `1px solid ${borderColor}` }}
                onChange={(e) => setPassword(e.target.value)}
             value={password}
+            required
              
             />
 

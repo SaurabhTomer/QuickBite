@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import axios from "./../../node_modules/axios/lib/axios";
+import axios from 'axios'
 import { serverUrl } from "./../config";
 
 const ForgotPassword = () => {
@@ -96,6 +96,7 @@ const ForgotPassword = () => {
 
             {/* send otp button */}
             <button
+            
               onClick={handleSendOtp}
               className={`w-full font-semibold py-2 rounded-lg transition 
                 duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
@@ -121,6 +122,7 @@ const ForgotPassword = () => {
                 placeholder="Enter OTP"
                 onChange={(e) => setOtp(e.target.value)}
                 value={otp}
+                required
               />
             </div>
 
@@ -151,6 +153,7 @@ const ForgotPassword = () => {
                 placeholder="Enter New Password"
                 onChange={(e) => setNewPassword(e.target.value)}
                 value={newPassword}
+                required
               />
             </div>
             {/* confirm password */}
@@ -167,6 +170,7 @@ const ForgotPassword = () => {
                 placeholder="Confirm Password"
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 value={confirmPassword}
+                required
               />
             </div>
 
