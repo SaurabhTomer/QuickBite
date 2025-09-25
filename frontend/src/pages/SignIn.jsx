@@ -8,6 +8,9 @@ import axios from "axios";
 import { serverUrl } from "../config.js";
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { auth } from '../firebase.js'; // Adjust the path if your firebase config is elsewhere
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/user.slice.js";
+
 
 
 function SignIn() {
@@ -23,6 +26,7 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
+  const dispatch = useDispatch()
 
   const handleSignIn = async () => {
     try {
@@ -34,7 +38,8 @@ function SignIn() {
         },
         { withCredentials: true }
       );
-      console.log(result);
+      dispatch(setUserData(result.data))
+      // console.log(result);
     } catch (error) {
       
       console.log(error);
@@ -51,8 +56,9 @@ function SignIn() {
     const data = await axios.post(`${serverUrl}/api/auth/google-auth`, {
       email: result.user.email}, 
       { withCredentials: true })
+      dispatch(setUserData(data))
 
-    console.log(data);
+    // console.log(data);
 
   } catch (error) {
     console.log(error);

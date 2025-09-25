@@ -9,6 +9,8 @@ import axios from 'axios'
 import { serverUrl } from '../config.js'
 import {GoogleAuthProvider , signInWithPopup} from 'firebase/auth'
 import { auth } from '../firebase.js'; // Adjust the path if your firebase config is elsewhere
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/user.slice.js";
 
 
 
@@ -27,6 +29,8 @@ function SignUp() {
   const[password , setPassword] = useState("")
   const[mobile , setMobile] = useState("")
   const[seterr , setErr] = useState("")
+
+  const dispatch = useDispatch()
   
 
   const handleGoogleAuth = async () => {
@@ -43,6 +47,7 @@ function SignUp() {
         role ,
         mobile 
       } , {withCredentials:true})
+       dispatch(setUserData(data))
 
       console.log(data);
       
@@ -61,6 +66,7 @@ function SignUp() {
       { fullName, email, password, mobile, role },
       { withCredentials: true }
     );
+    dispatch(setUserData(result.data))
 
     console.log(result);
     toast.success("SignUp successful!"); // show success toast
