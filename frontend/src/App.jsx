@@ -5,8 +5,10 @@ import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import ForgotPassword from './pages/ForgotPassword'
 import { Toaster } from 'react-hot-toast'
+import useGetCurrentUser from './../hooks/useGetCurrentUser';
 
 const App = () => {
+  useGetCurrentUser()
   return (
     <div>
       <Toaster position='top-center' reverseOrder={false}/>
