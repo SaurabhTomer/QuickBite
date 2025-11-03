@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000 ;
 
 
 app.listen(port , () => {
-    connectDB();
+    connectDB();                                //database connected
     console.log(`server started at ${port}`); 
 })
 
