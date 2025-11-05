@@ -3,8 +3,12 @@ import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { serverUrl } from "../App";
 
 function SignUp() {
+
+    //color properties 
   const bgColor = "#fff9f6";
   const primaryColor = "#ff4d2d";
   const hoverColor = "#e64323";
@@ -12,7 +16,33 @@ function SignUp() {
 
   const [showPassword, setShowPassword] = useState(false); //  state for toggling visibility
   const [role, setRole] = useState("user"); //state for role
+
+  //naviagte to move to next pages
   const navigate = useNavigate();
+
+  //states for  user entered field
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mobile, setMobile] = useState("");
+
+
+//   function to handle submit signup data
+  const handleSignUp = async () => {
+    try {
+        const result = await axios.post(`${serverUrl}/api/auth/signup`,
+        {
+            fullName,email,password,mobile,role
+        },
+        {withCredentials:true}
+    )
+    console.log(result);
+    
+    } catch (error) {
+        console.log(error);   
+    }
+  }
+
   return (
     <div
       className="min-h-screen w-full flex items-center justify-center p-4"
@@ -45,6 +75,8 @@ function SignUp() {
             className="w-full border rounded-lg px-3 py-2 focus:outline-none"
             placeholder="Enter Your Full Name"
             style={{ border: `1px solid ${borderColor}` }}
+            onChange={(e) => setFullName(e.target.value)}
+            value={fullName}
           />
         </div>
 
@@ -61,6 +93,8 @@ function SignUp() {
             className="w-full border rounded-lg px-3 py-2 focus:outline-none"
             placeholder="Enter Your Email"
             style={{ border: `1px solid ${borderColor}` }}
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
           />
         </div>
 
@@ -77,6 +111,8 @@ function SignUp() {
             className="w-full border rounded-lg px-3 py-2 focus:outline-none "
             placeholder="Enter Your Mobile Number"
             style={{ border: `1px solid ${borderColor}` }}
+            onChange={(e) => setMobile(e.target.value)}
+            value={mobile}
           />
         </div>
 
@@ -94,6 +130,8 @@ function SignUp() {
               className="w-full border rounded-lg px-3 py-2 focus:outline-none "
               placeholder="Enter Your Password"
               style={{ border: `1px solid ${borderColor}` }}
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
             />
             <button
               className="absolute right-3 top-3 text-gray-500 cursor-pointer "
@@ -133,6 +171,7 @@ function SignUp() {
         {/* signup button */}
         <button
           className={`w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg  `}
+          onClick={handleSignUp}
         >
           Sign Up
         </button>
