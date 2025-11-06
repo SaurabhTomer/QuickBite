@@ -241,7 +241,7 @@ export const resetPassword = async (req, res) => {
 
 export const googleAuth = async (req, res) => {
   try {
-    //fetch data from body
+    //fetch data fromm body
     const { fullName, email, mobile  , role} = req.body;
     //find user in db
     let user = await User.findOne({ email });
