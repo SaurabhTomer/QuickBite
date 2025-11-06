@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 import { serverUrl } from "../App";
 
 function ForgotPassword() {
@@ -14,6 +14,9 @@ function ForgotPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
 
+  //state to show error
+  const [error, setError] = useState("");
+
   //handle send otp functionality
   const handleSendOtp = async () => {
     try {
@@ -22,11 +25,18 @@ function ForgotPassword() {
         { email },
         { withCredentials: true }
       );
-      console.log(result);
+      // console.log(result);
       // necessary to move to move to next page
       setStep(2);
+
+      setError("");
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      return setError(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "something went wrong"
+      );
     }
   };
 
@@ -38,30 +48,47 @@ function ForgotPassword() {
         { email, otp },
         { withCredentials: true }
       );
-      console.log(result);
+      // console.log(result);
       // necessary to move to move to next page
       setStep(3);
+
+      setError("");
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      return setError(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "something went wrong"
+      );
     }
   };
 
   //handle reset password
   const handleReset = async () => {
     if (newPassword != confirmPassword) {
-      return null;
+       return setError(
+          error.response?.data?.message ||
+            error.response?.data?.error ||
+            "something went wrong"
+        );
     } else {
       try {
         const result = await axios.post(
           `${serverUrl}/api/auth/reset-password`,
-          { email , newPassword },
+          { email, newPassword },
           { withCredentials: true }
         );
-        console.log(result.data);
+        // console.log(result.data);
+        setError("");
         // necessary to move to move to next page
         navigate("/signin");
       } catch (error) {
-        console.log(error);
+        // console.log(error);
+        return setError(
+          error.response?.data?.message ||
+            error.response?.data?.error ||
+            "something went wrong"
+        );
       }
     }
   };
@@ -110,6 +137,8 @@ function ForgotPassword() {
             >
               Send OTP
             </button>
+            {/* Show error message if any */}
+            <p className="text-red-500 text-center my-2.5"> {error} </p>
           </div>
         )}
 
@@ -142,6 +171,8 @@ function ForgotPassword() {
             >
               Verify OTP
             </button>
+            {/* Show error message if any */}
+            <p className="text-red-500 text-center my-2.5"> {error} </p>
           </div>
         )}
 
@@ -162,7 +193,6 @@ function ForgotPassword() {
                 placeholder=" New Password "
                 onChange={(e) => setNewPassword(e.target.value)}
                 value={newPassword}
-                
               />
             </div>
 
@@ -185,12 +215,15 @@ function ForgotPassword() {
             {/*  password button */}
             <button
               className={
-                "w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
+                "w-full font-semibold cursor-pointer text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
               }
               onClick={handleReset}
             >
               Reset Password
             </button>
+
+            {/* Show error message if any */}
+            <p className="text-red-500 text-center my-2.5"> {error} </p>
           </div>
         )}
       </div>

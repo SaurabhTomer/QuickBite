@@ -209,42 +209,68 @@ export const verifyOtp = async (req, res) => {
   }
 };
 
+
 export const resetPassword = async (req, res) => {
   try {
-    //fetch data
-    const { email, newPassword } = req.body;
+    // Fetch data
+    const { email, newPassword, confirmPassword } = req.body;
 
-    //  Validate input
-    if (!email || !newPassword) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Email and new password are required",
-        });
+    // Validate input
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, new password, and confirm password are required",
+      });
     }
 
-    //check user exist or not
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Passwords do not match",
+      });
+    }
+
+    // Check if user exists
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res.status(400).json({ message: "user not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    //hash password
+    // Check if OTP is verified (optional)
+    if (!user.isOtpVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP verification required before resetting password",
+      });
+    }
+
+    // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
-    //updated details before save user
+
+    // Reset OTP status
     user.isOtpVerified = false;
 
-    //save user
+    // Save user
     await user.save();
 
-    return res.status(200).json({ message: "Password reset successfully" });
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    });
   } catch (error) {
-    return res.status(500).json(`reset password error ${error}`);
+    console.error("Reset password error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while resetting password",
+      error: error.message,
+    });
   }
 };
+
 
 export const googleAuth = async (req, res) => {
   try {
