@@ -82,10 +82,17 @@ export const signIn = async (req, res) => {
     const { email, password } = req.body;
 
     // Validate input
-    if (!email || !password) {
+    if (!email ) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required",
+        message: "Email  is required",
+      });
+    }
+     // Validate input
+    if (!password ) {
+      return res.status(400).json({
+        success: false,
+        message: "Password  is required",
       });
     }
 

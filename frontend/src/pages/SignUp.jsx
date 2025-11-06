@@ -207,18 +207,18 @@ function SignUp() {
 
         {/* signup button */}
         <button
-          className={`w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg  `}
+          className={`w-full font-semibold cursor-pointer pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg  `}
           onClick={handleSignUp}
         >
           Sign Up
         </button>
 
         {/* Show error message if any */}
-        <p className="text-red-500 text-center my-2.5"> *{error} </p>
+        <p className="text-red-500 text-center my-2.5"> {error} </p>
 
         {/* signup  with google */}
         <button
-          className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 hover:bg-gray-100 border-gray-400"
+          className="w-full mt-4 flex items-center cursor-pointer justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 hover:bg-gray-100 border-gray-400"
           onClick={handleGoogleAuth}
         >
           <FcGoogle size={20} />
