@@ -98,6 +98,7 @@ function ForgotPassword() {
                 placeholder="Enter Your Email"
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
+                required
               />
             </div>
             {/*  send otp button */}
@@ -129,6 +130,7 @@ function ForgotPassword() {
                 placeholder="Enter OTP "
                 onChange={(e) => setOtp(e.target.value)}
                 value={otp}
+                required
               />
             </div>
             {/*  verify button */}
@@ -160,6 +162,7 @@ function ForgotPassword() {
                 placeholder=" New Password "
                 onChange={(e) => setNewPassword(e.target.value)}
                 value={newPassword}
+                
               />
             </div>
 

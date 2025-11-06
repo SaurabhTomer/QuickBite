@@ -27,6 +27,9 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [mobile, setMobile] = useState("");
 
+  //state to show error
+  const [error , setError] = useState("")
+
   //   function to handle submit signup data
   const handleSignUp = async () => {
     try {
@@ -41,9 +44,11 @@ function SignUp() {
         },
         { withCredentials: true }
       );
+      setError("")
       console.log(result);
     } catch (error) {
-      console.log(error);
+       setError(error.response?.data?.message || error.response?.data?.error || "Something went wrong");
+
     }
   };
 
@@ -51,7 +56,7 @@ function SignUp() {
   const handleGoogleAuth = async () => {
 
     if( !mobile ){
-      return alert("Please enter your mobile number before signing up with google")
+      return   setError("Mobile number is required for google signup")
 
     }
     const provider = new GoogleAuthProvider();
@@ -124,6 +129,7 @@ function SignUp() {
             style={{ border: `1px solid ${borderColor}` }}
             onChange={(e) => setEmail(e.target.value)}
             value={email}
+            required
           />
         </div>
 
@@ -142,6 +148,7 @@ function SignUp() {
             style={{ border: `1px solid ${borderColor}` }}
             onChange={(e) => setMobile(e.target.value)}
             value={mobile}
+            required
           />
         </div>
 
@@ -161,6 +168,7 @@ function SignUp() {
               style={{ border: `1px solid ${borderColor}` }}
               onChange={(e) => setPassword(e.target.value)}
               value={password}
+              required
             />
             <button
               className="absolute right-3 top-3 text-gray-500 cursor-pointer "
@@ -204,6 +212,9 @@ function SignUp() {
         >
           Sign Up
         </button>
+
+        {/* Show error message if any */}
+        <p className="text-red-500 text-center my-2.5"> *{error} </p>
 
         {/* signup  with google */}
         <button
