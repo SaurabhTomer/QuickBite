@@ -49,9 +49,27 @@ function SignUp() {
 
   //function to handle google auth thorough firebase
   const handleGoogleAuth = async () => {
+
+    if( !mobile ){
+      return alert("Please enter your mobile number before signing up with google")
+
+    }
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
-    console.log(result);
+    // console.log(result);
+    try {
+      const data = await axios.post(`${serverUrl}/api/auth/google-auth`,
+        {fullName:result.user.displayName,
+          email:result.user.email,
+          role,
+          mobile,
+        } , {withCredentials:true})
+        console.log(data);
+        
+    } catch (error) {
+      console.log(error);
+      
+    }
   };
 
   return (

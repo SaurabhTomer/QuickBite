@@ -99,7 +99,7 @@ export const signIn = async (req, res) => {
     }
 
     // Compare password
-    const isMatched = await bcrypt.compare(password , user.password);
+    const isMatched = await bcrypt.compare(password, user.password);
     if (!isMatched) {
       return res.status(400).json({
         success: false,
@@ -144,22 +144,22 @@ export const signOut = async (req, res) => {
   }
 };
 
-export const sendOtp = async (req,res) => {
+export const sendOtp = async (req, res) => {
   try {
     //fetch email from body
-    const {email} = req.body;
+    const { email } = req.body;
     //vaidate email
-    if( !email){
-      return res.status(400).json({message:"send email"})
+    if (!email) {
+      return res.status(400).json({ message: "send email" });
     }
     //check user exist or not
-    const user = await User.findOne({email})
-    if(!user){
-        return res.status(400).json({message:"User does not exists"})
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User does not exists" });
     }
     //generate otp
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    //save generated otp in user  details 
+    //save generated otp in user  details
     user.resetOtp = otp;
     user.otpExpires = Date.now() + 5 * 60 * 1000;
     user.isOtpverified = false;
@@ -167,28 +167,25 @@ export const sendOtp = async (req,res) => {
     await user.save();
 
     //send mail
-    await sendotpMail(user.email , otp);
+    await sendotpMail(user.email, otp);
 
-     return res.status(200).json({message:"otp send successfully"})
-    
-
+    return res.status(200).json({ message: "otp send successfully" });
   } catch (error) {
     // console.log("otp send error");
-     return res.status(500).json(`send otp error ${error}`)
-    
+    return res.status(500).json(`send otp error ${error}`);
   }
-}
+};
 
-export const verifyOtp = async (req,res) => {
+export const verifyOtp = async (req, res) => {
   try {
-   //fetch email , otp from body
-    const {email , otp} = req.body;
-    
-    //check user exist or not
-    const user = await User.findOne({email})
+    //fetch email , otp from body
+    const { email, otp } = req.body;
 
-    if(!user || user.resetOtp != otp || user.otpExpires < Date.now() ){
-        return res.status(400).json({message:"Invalid / Expired Otp"})
+    //check user exist or not
+    const user = await User.findOne({ email });
+
+    if (!user || user.resetOtp != otp || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "Invalid / Expired Otp" });
     }
 
     //updating  condition after checking condition
@@ -197,112 +194,80 @@ export const verifyOtp = async (req,res) => {
     user.otpExpires = undefined;
 
     //save user with modified details
-    await user.save()
+    await user.save();
 
-    return res.status(200).json({message:"otp verify successfully"})
-    
-
+    return res.status(200).json({ message: "otp verify successfully" });
   } catch (error) {
-     return res.status(500).json(`verify otp error ${error}`)
-    
+    return res.status(500).json(`verify otp error ${error}`);
   }
-}
+};
 
-export const resetPassword = async (req,res) => {
+export const resetPassword = async (req, res) => {
   try {
     //fetch data
-    const {email , newPassword} = req.body;
-   
-     //  Validate input
+    const { email, newPassword } = req.body;
+
+    //  Validate input
     if (!email || !newPassword) {
-      return res.status(400).json({ success: false, message: "Email and new password are required" });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Email and new password are required",
+        });
     }
-   
-    
+
     //check user exist or not
-    const user = await User.findOne({email})
+    const user = await User.findOne({ email });
 
-    if(!user  ){
-        return res.status(400).json({message:"user not found"})
+    if (!user) {
+      return res.status(400).json({ message: "user not found" });
     }
-
-    
 
     //hash password
-    const hashedPassword = await bcrypt.hash(newPassword , 10);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     //updated details before save user
     user.isOtpVerified = false;
 
     //save user
-    await  user.save();
+    await user.save();
 
-    return res.status(200).json({message:"Password reset successfully"})
-
-
+    return res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
-    return res.status(500).json(`reset password error ${error}`)
+    return res.status(500).json(`reset password error ${error}`);
   }
-}
+};
 
-
-
-// Controller to handle Google login/signup
 export const googleAuth = async (req, res) => {
   try {
-    // Frontend sends a "credential" (Google token)
-    const { credential } = req.body;
-    if (!credential) {
-      return res.status(400).json({ success: false, message: "No credential provided" });
-    }
-
-    // Verify token with Google
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    // Extract user data from Google payload
-    const payload = ticket.getPayload();
-    const { email, name, picture, sub } = payload;
-
-    // Check if user already exists in DB
+    //fetch data from body
+    const { fullName, email, mobile  , role} = req.body;
+    //find user in db
     let user = await User.findOne({ email });
 
-    // If new user, create one
+    //if not found then create with this details
     if (!user) {
       user = await User.create({
-        fullName: name,
+        fullName,
         email,
-        googleId: sub, // Google's unique user ID
-        profilePic: picture,
+        mobile,
+        role
       });
     }
-
-    // Generate JWT token for session authentication
-    const token = genToken(token)
-
-    // Store token in HTTP-only cookie for security
+    //generate token if user is created or if user is already present thn user id is already with it
+    const token = genToken(user._id);
+    //save token in cookie
     res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
     });
+    //return user
 
-    // Respond with user data and token
-    return res.status(200).json({
-      success: true,
-      message: "Google authentication successful",
-      user,
-      token,
-    });
-
+    return res.status(200).json(user);
   } catch (error) {
-    console.error("Google Auth Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Google authentication failed",
-    });
+    return res.status(500).json(`google auth error ${error}`);
   }
 };
