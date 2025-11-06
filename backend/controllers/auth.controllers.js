@@ -99,7 +99,7 @@ export const signIn = async (req, res) => {
     }
 
     // Compare password
-    const isMatched = bcrypt.compare(password, user.password);
+    const isMatched = await bcrypt.compare(password , user.password);
     if (!isMatched) {
       return res.status(400).json({
         success: false,
@@ -213,8 +213,6 @@ export const resetPassword = async (req,res) => {
     //fetch data
     const {email , newPassword} = req.body;
    
-    
-
      //  Validate input
     if (!email || !newPassword) {
       return res.status(400).json({ success: false, message: "Email and new password are required" });
@@ -246,3 +244,65 @@ export const resetPassword = async (req,res) => {
     return res.status(500).json(`reset password error ${error}`)
   }
 }
+
+
+
+// Controller to handle Google login/signup
+export const googleAuth = async (req, res) => {
+  try {
+    // Frontend sends a "credential" (Google token)
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ success: false, message: "No credential provided" });
+    }
+
+    // Verify token with Google
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    // Extract user data from Google payload
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub } = payload;
+
+    // Check if user already exists in DB
+    let user = await User.findOne({ email });
+
+    // If new user, create one
+    if (!user) {
+      user = await User.create({
+        fullName: name,
+        email,
+        googleId: sub, // Google's unique user ID
+        profilePic: picture,
+      });
+    }
+
+    // Generate JWT token for session authentication
+    const token = genToken(token)
+
+    // Store token in HTTP-only cookie for security
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Respond with user data and token
+    return res.status(200).json({
+      success: true,
+      message: "Google authentication successful",
+      user,
+      token,
+    });
+
+  } catch (error) {
+    console.error("Google Auth Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Google authentication failed",
+    });
+  }
+};

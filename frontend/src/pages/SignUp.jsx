@@ -3,12 +3,13 @@ import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
 
 function SignUp() {
-
-    //color properties 
+  //color properties
   const bgColor = "#fff9f6";
   const primaryColor = "#ff4d2d";
   const hoverColor = "#e64323";
@@ -26,22 +27,32 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [mobile, setMobile] = useState("");
 
-
-//   function to handle submit signup data
+  //   function to handle submit signup data
   const handleSignUp = async () => {
     try {
-        const result = await axios.post(`${serverUrl}/api/auth/signup`,
+      const result = await axios.post(
+        `${serverUrl}/api/auth/signup`,
         {
-            fullName,email,password,mobile,role
+          fullName,
+          email,
+          password,
+          mobile,
+          role,
         },
-        {withCredentials:true}
-    )
-    console.log(result);
-    
+        { withCredentials: true }
+      );
+      console.log(result);
     } catch (error) {
-        console.log(error);   
+      console.log(error);
     }
-  }
+  };
+
+  //function to handle google auth thorough firebase
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    console.log(result);
+  };
 
   return (
     <div
@@ -177,7 +188,10 @@ function SignUp() {
         </button>
 
         {/* signup  with google */}
-        <button className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 hover:bg-gray-100 border-gray-400">
+        <button
+          className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 hover:bg-gray-100 border-gray-400"
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle size={20} />
           <span>Sign Up with Google</span>
         </button>
