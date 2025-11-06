@@ -23,7 +23,7 @@ import mongoose from "mongoose";
         required:true,
     },
     resetOtp:{
-        type:Number
+        type:String
     },
     isOtpVerified:{
         type:Boolean,

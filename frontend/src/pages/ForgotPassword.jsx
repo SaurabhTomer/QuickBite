@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { serverUrl } from "../App";
 
 function ForgotPassword() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [step, setStep] = useState(1); //state for steps
   //states for user entered fields
@@ -11,6 +13,58 @@ function ForgotPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
+
+  //handle send otp functionality
+  const handleSendOtp = async () => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/auth/send-otp`,
+        { email },
+        { withCredentials: true }
+      );
+      console.log(result);
+      // necessary to move to move to next page
+      setStep(2);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //handle verify otp
+  const handleVerifyOtp = async () => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/auth/verify-otp`,
+        { email, otp },
+        { withCredentials: true }
+      );
+      console.log(result);
+      // necessary to move to move to next page
+      setStep(3);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //handle reset password
+  const handleReset = async () => {
+    if (newPassword != confirmPassword) {
+      return null;
+    } else {
+      try {
+        const result = await axios.post(
+          `${serverUrl}/api/auth/reset-password`,
+          { email , newPassword },
+          { withCredentials: true }
+        );
+        console.log(result.data);
+        // necessary to move to move to next page
+        navigate("/signin");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <div className="flex items-center justify-center w-full min-h-screen p-4 bg-[#fff9f6]">
@@ -51,6 +105,7 @@ function ForgotPassword() {
               className={
                 "w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
               }
+              onClick={handleSendOtp}
             >
               Send OTP
             </button>
@@ -81,6 +136,7 @@ function ForgotPassword() {
               className={
                 "w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
               }
+              onClick={handleVerifyOtp}
             >
               Verify OTP
             </button>
@@ -128,6 +184,7 @@ function ForgotPassword() {
               className={
                 "w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
               }
+              onClick={handleReset}
             >
               Reset Password
             </button>
