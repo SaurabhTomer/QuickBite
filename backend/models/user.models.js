@@ -21,6 +21,16 @@ import mongoose from "mongoose";
         type:String,
         enum:["user","owner" , "deliveryPerson"],
         required:true,
+    },
+    resetOtp:{
+        type:Number
+    },
+    isOtpVerified:{
+        type:Boolean,
+        default:false
+    },
+    otpExpires:{
+        type:Date
     }
 
 } , {timestamps:true})
