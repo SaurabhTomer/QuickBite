@@ -3,6 +3,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { ClipLoader } from 'react-spinners'
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -17,8 +18,12 @@ function ForgotPassword() {
   //state to show error
   const [error, setError] = useState("");
 
+    //to show loading icon
+    const [loading , setLoading] = useState(false);
+
   //handle send otp functionality
   const handleSendOtp = async () => {
+       setLoading(true);
     try {
       const result = await axios.post(
         `${serverUrl}/api/auth/send-otp`,
@@ -28,9 +33,11 @@ function ForgotPassword() {
       // console.log(result);
       // necessary to move to move to next page
       setStep(2);
+         setLoading(false);
 
       setError("");
     } catch (error) {
+         setLoading(false);
       // console.log(error);
       return setError(
         error.response?.data?.message ||
@@ -42,6 +49,7 @@ function ForgotPassword() {
 
   //handle verify otp
   const handleVerifyOtp = async () => {
+       setLoading(true);
     try {
       const result = await axios.post(
         `${serverUrl}/api/auth/verify-otp`,
@@ -51,9 +59,11 @@ function ForgotPassword() {
       // console.log(result);
       // necessary to move to move to next page
       setStep(3);
+         setLoading(false);
 
       setError("");
     } catch (error) {
+       setLoading(false);
       // console.log(error);
       return setError(
         error.response?.data?.message ||
@@ -66,12 +76,15 @@ function ForgotPassword() {
   //handle reset password
   const handleReset = async () => {
     if (newPassword != confirmPassword) {
-       return setError(
-          error.response?.data?.message ||
-            error.response?.data?.error ||
-            "something went wrong"
-        );
-    } else {
+      return setError(
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "something went wrong"
+      );
+
+     
+    } 
+     setLoading(true); 
       try {
         const result = await axios.post(
           `${serverUrl}/api/auth/reset-password`,
@@ -80,9 +93,11 @@ function ForgotPassword() {
         );
         // console.log(result.data);
         setError("");
+         setLoading(false);
         // necessary to move to move to next page
         navigate("/signin");
       } catch (error) {
+         setLoading(false);
         // console.log(error);
         return setError(
           error.response?.data?.message ||
@@ -90,7 +105,7 @@ function ForgotPassword() {
             "something went wrong"
         );
       }
-    }
+    
   };
 
   return (
@@ -134,8 +149,10 @@ function ForgotPassword() {
                 "w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
               }
               onClick={handleSendOtp}
+               //work when loadind is true disbale the button
+          disabled={loading}
             >
-              Send OTP
+              {loading ? <ClipLoader size={20} color="white" /> : "Send OTP"}
             </button>
             {/* Show error message if any */}
             <p className="text-red-500 text-center my-2.5"> {error} </p>
@@ -168,8 +185,10 @@ function ForgotPassword() {
                 "w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
               }
               onClick={handleVerifyOtp}
+               //work when loadind is true disbale the button
+          disabled={loading}
             >
-              Verify OTP
+               {loading ? <ClipLoader size={20} color="white" /> : "Verify OTP"}
             </button>
             {/* Show error message if any */}
             <p className="text-red-500 text-center my-2.5"> {error} </p>
@@ -218,8 +237,10 @@ function ForgotPassword() {
                 "w-full font-semibold cursor-pointer text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
               }
               onClick={handleReset}
+               //work when loadind is true disbale the button
+          disabled={loading}
             >
-              Reset Password
+                 {loading ? <ClipLoader size={20} color="white" /> : "Reset Password"}
             </button>
 
             {/* Show error message if any */}

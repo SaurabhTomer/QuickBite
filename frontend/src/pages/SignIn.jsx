@@ -7,6 +7,7 @@ import axios from 'axios';
 import { serverUrl } from "../App";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebase";
+import { ClipLoader } from 'react-spinners'
 
 function SignIn() {
 
@@ -30,10 +31,14 @@ function SignIn() {
    //state to show error
     const [error , setError] = useState("")
 
+      //to show loading icon
+      const [loading , setLoading] = useState(false);
+
 
 
 //   function to handle submit signin data
   const handleSignIn = async () => {
+    setLoading(true);
     try {
         const result = await axios.post(`${serverUrl}/api/auth/signin`,
         {
@@ -43,9 +48,11 @@ function SignIn() {
     )
     setError("")
     // console.log(result);
+    setLoading(false);
     
     } catch (error) {
         //console.log(error); 
+        setLoading(false);
         return setError(error.response?.data?.message || error.response?.data?.error || "something went wrong");  
     }
   }
@@ -151,8 +158,11 @@ function SignIn() {
         <button
           className={`w-full font-semibold  text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg cursor-pointer `}
           onClick={handleSignIn}
+           //work when loadind is true disbale the button
+          disabled={loading}
         >
-          Sign In
+                {loading ? <ClipLoader size={20}  color="white"/> : "Sign Up"}
+        
         </button>
 
          {/* Show error message if any */}
