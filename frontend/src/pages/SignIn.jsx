@@ -3,22 +3,22 @@ import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 import { serverUrl } from "../App";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebase";
-import { ClipLoader } from 'react-spinners'
+import { ClipLoader } from "react-spinners";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 
 function SignIn() {
-
-    //color properties 
+  //color properties
   const bgColor = "#fff9f6";
   const primaryColor = "#ff4d2d";
   const hoverColor = "#e64323";
   const borderColor = "#ddd";
 
   const [showPassword, setShowPassword] = useState(false); //  state for toggling visibility
-
 
   //naviagte to move to next pages
   const navigate = useNavigate();
@@ -28,54 +28,62 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-   //state to show error
-    const [error , setError] = useState("")
+  //state to show error
+  const [error, setError] = useState("");
 
-      //to show loading icon
-      const [loading , setLoading] = useState(false);
+  //to show loading icon
+  const [loading, setLoading] = useState(false);
 
+  const dispatch = useDispatch();
 
-
-//   function to handle submit signin data
+  //   function to handle submit signin data
   const handleSignIn = async () => {
     setLoading(true);
     try {
-        const result = await axios.post(`${serverUrl}/api/auth/signin`,
+      const result = await axios.post(
+        `${serverUrl}/api/auth/signin`,
         {
-            email , password
+          email,
+          password,
         },
-        {withCredentials:true}
-    )
-    setError("")
-    // console.log(result);
-    setLoading(false);
-    
+        { withCredentials: true }
+      );
+      setError("");
+      // console.log(result);
+      //set user data in redux store
+      dispatch(setUserData(result.data));
+      setLoading(false);
     } catch (error) {
-        //console.log(error); 
-        setLoading(false);
-        return setError(error.response?.data?.message || error.response?.data?.error || "something went wrong");  
+      //console.log(error);
+      setLoading(false);
+      return setError(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "something went wrong"
+      );
     }
-  }
+  };
 
   //function to handle google auth thorough firebase
-    const handleGoogleAuth = async () => {
-  
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      // console.log(result);
-      try {
-        const data = await axios.post(`${serverUrl}/api/auth/google-auth`,
-          {
-            email:result.user.email,
-           
-          } , {withCredentials:true})
-          console.log(data);
-          
-      } catch (error) {
-        console.log(error);
-        
-      }
-    };
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    // console.log(result);
+    try {
+      const data = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        {
+          email: result.user.email,
+        },
+        { withCredentials: true }
+      );
+      // console.log(data);
+      //uset user data in rdux store
+      dispatch(setUserData(data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div
@@ -96,7 +104,6 @@ function SignIn() {
           Sign In to your account to get Started with delicious food deliveries
         </p>
 
-
         {/* email */}
         <div className="mb-4">
           <label
@@ -115,8 +122,6 @@ function SignIn() {
             required
           />
         </div>
-
-       
 
         {/* password */}
         <div className="mb-4">
@@ -147,30 +152,31 @@ function SignIn() {
         </div>
 
         {/* forgot password */}
-        <div className="text-right mb-4 text-[#ff4d2d] cursor-pointer" 
-        onClick={() => navigate('/forgot-password')}>
-            Forgot Password
+        <div
+          className="text-right mb-4 text-[#ff4d2d] cursor-pointer"
+          onClick={() => navigate("/forgot-password")}
+        >
+          Forgot Password
         </div>
-
-        
 
         {/* signin button */}
         <button
           className={`w-full font-semibold  text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg cursor-pointer `}
           onClick={handleSignIn}
-           //work when loadind is true disbale the button
+          //work when loadind is true disbale the button
           disabled={loading}
         >
-                {loading ? <ClipLoader size={20}  color="white"/> : "Sign Up"}
-        
+          {loading ? <ClipLoader size={20} color="white" /> : "Sign Up"}
         </button>
 
-         {/* Show error message if any */}
+        {/* Show error message if any */}
         <p className="text-red-500 text-center my-2.5"> {error} </p>
 
         {/* signup  with google */}
-        <button className="w-full mt-4 flex items-center cursor-pointer justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 hover:bg-gray-100 border-gray-400"
-        onClick={handleGoogleAuth}>
+        <button
+          className="w-full mt-4 flex items-center cursor-pointer justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 hover:bg-gray-100 border-gray-400"
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle size={20} />
           <span>Sign In with Google</span>
         </button>
