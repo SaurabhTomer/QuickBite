@@ -6,7 +6,7 @@ import { isAuth } from './../middlewares/auth.middlewares.js';
 const userRouter = express.Router();
 
 
-authRouter.get('/CurrentUser' ,isAuth ,  getCurrentUser);
+userRouter.get('/CurrentUser' ,isAuth ,  getCurrentUser);
 
 
 export default userRouter;
