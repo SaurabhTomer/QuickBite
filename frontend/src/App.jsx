@@ -1,27 +1,54 @@
+// Importing required modules from react-router-dom for routing
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import {Routes , Route, Navigate} from 'react-router-dom'
-import SignUp from './pages/SignUp'
-import SignIn from './pages/SignIn'
-import ForgotPassword from './pages/ForgotPassword'
-import usegetCurrentuser from './hooks/usegetCurrentuser'
-import { useSelector } from 'react-redux'
-import Home from './pages/Home'
-//url  of backend where  it is running
-export const serverUrl = "http://localhost:8000"
+// Importing all the pages (components) of the app
+import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
+import ForgotPassword from "./pages/ForgotPassword";
+import Home from "./pages/Home";
+import Navbar from './components/Navbar'
+
+// Importing custom hook to fetch current logged-in user
+import usegetCurrentuser from "./hooks/usegetCurrentuser";
+
+// Importing useSelector from redux to access the Redux store state
+import { useSelector } from "react-redux";
+
+// Backend server URL (API base URL)
+export const serverUrl = "http://localhost:8000";
 
 function App() {
-  usegetCurrentuser()
+  // Call the custom hook that fetches current user info (if logged in)
+  // This runs once when the App component mounts
+  usegetCurrentuser();
 
-  const {userData} = useSelector(state => state.user)
+  // Get user data from Redux store
+  const { userData } = useSelector((state) => state.user);
 
+  // Define all routes using <Routes> and <Route>
   return (
-   <Routes>
-        <Route path='/' element={ userData ? <Home/> : <Navigate to={'/signin'}/>} />
-        <Route path='/signup' element={ !userData ? <SignUp/> : <Navigate to={'/'}/>} />
-        <Route path='/signin' element={ !userData ? <SignIn/> : <Navigate to={'/'}/>} />
-        <Route path='/forgot-password' element={ !userData ? <ForgotPassword/> : <Navigate to={'/'}/>} />
-   </Routes>
-  )
+    <Routes>
+      <Route
+        path="/"
+        element={userData ? <Home /> : <Navigate to={"/signin"} />}
+      />
+
+      <Route
+        path="/signup"
+        element={!userData ? <SignUp /> : <Navigate to={"/"} />}
+      />
+
+      <Route
+        path="/signin"
+        element={!userData ? <SignIn /> : <Navigate to={"/"} />}
+      />
+
+      <Route
+        path="/forgot-password"
+        element={!userData ? <ForgotPassword /> : <Navigate to={"/"} />}
+      />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
