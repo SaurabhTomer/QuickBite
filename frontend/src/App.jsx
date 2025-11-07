@@ -13,6 +13,7 @@ import usegetCurrentuser from "./hooks/usegetCurrentuser";
 
 // Importing useSelector from redux to access the Redux store state
 import { useSelector } from "react-redux";
+import useGetCity from "./hooks/useGetCity";
 
 // Backend server URL (API base URL)
 export const serverUrl = "http://localhost:8000";
@@ -21,6 +22,7 @@ function App() {
   // Call the custom hook that fetches current user info (if logged in)
   // This runs once when the App component mounts
   usegetCurrentuser();
+  useGetCity();
 
   // Get user data from Redux store
   const { userData } = useSelector((state) => state.user);

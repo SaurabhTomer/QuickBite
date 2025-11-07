@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 
 function Navbar() {
-  const { userData } = useSelector((state) => state.user);
+  const { userData , city } = useSelector((state) => state.user);
 
   // state for user info popup
   const [showInfo, setShowInfo] = useState(false);
@@ -21,12 +21,12 @@ function Navbar() {
           {/* 📍 Location Section */}
           <div className="flex items-center w-[30%] gap-2 border-r border-gray-300">
             <FaLocationDot className="text-[#ff4d2d]" size={20} />
-            <span className="text-gray-600 truncate">Bijnor</span>
+            <span className="text-gray-600 truncate">{city}</span>
           </div>
 
           {/* 🔍 Search Input */}
           <div className="flex items-center w-[70%] gap-2">
-            <CiSearch size={20} className="text-[#ff4d2d]" />
+            <CiSearch size={20} className="text-[#ff4d2d] md:hidden" />
             <input
               type="text"
               placeholder="Search delicious food..."
@@ -52,7 +52,7 @@ function Navbar() {
         {/* 📍 Location */}
         <div className="flex items-center w-[30%] gap-2 border-r border-gray-300">
           <FaLocationDot className="text-[#ff4d2d]" size={20} />
-          <span className="text-gray-600 truncate">Bijnor</span>
+          <span className="text-gray-600 truncate">{city}</span>
         </div>
 
         {/* 🔎 Search Input */}
@@ -104,7 +104,7 @@ function Navbar() {
           className="w-10 h-10 rounded-full flex items-center justify-center bg-[#ff4d2d] text-white text-lg font-semibold shadow-md cursor-pointer"
           onClick={() => setShowInfo((prev) => !prev)}
         >
-          {userData?.fullName.slice(0,1).toUpperCase()}
+         {userData?.fullName?.charAt(0).toUpperCase()}
         </div>
 
         {/* 💬 Profile Popup */}
