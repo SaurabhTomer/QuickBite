@@ -2,8 +2,11 @@ import { FaLocationDot } from "react-icons/fa6";
 import { CiSearch } from "react-icons/ci";
 import { FaCartShopping } from "react-icons/fa6";
 import { GiCrossMark } from "react-icons/gi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
+import { serverUrl } from "../App";
+import { setUserData } from "../redux/userSlice";
+import axios from "axios";
 
 function Navbar() {
   const { userData , city } = useSelector((state) => state.user);
@@ -12,6 +15,18 @@ function Navbar() {
   const [showInfo, setShowInfo] = useState(false);
   // state for small-screen search bar
   const [showSearch, setShowSearch] = useState(false);
+  const dispatch  = useDispatch()
+
+  //function to handle logout
+  const handleLogout = async () => {
+    try {
+      const result = await axios.get(`${serverUrl}/api/auth/signout`,{withCredentials:true})
+      dispatch(setUserData(null))
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
 
   return (
     <div className="w-full h-20 flex items-center justify-between px-4 md:px-10 fixed top-0 z-9999 bg-[#fff9f6] shadow-sm">
@@ -119,7 +134,8 @@ function Navbar() {
               My Orders
             </p>
 
-            <p className="text-[#ff4d2d] font-semibold cursor-pointer hover:text-[#e64323] transition">
+            <p className="text-[#ff4d2d] font-semibold cursor-pointer hover:text-[#e64323] transition"
+            onClick={handleLogout}>
               Log Out
             </p>
           </div>
