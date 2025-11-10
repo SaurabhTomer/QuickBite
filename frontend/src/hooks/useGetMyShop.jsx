@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { serverUrl } from "../App";
 import { useDispatch } from "react-redux";
-import { setUserData } from "../redux/userSlice";
+import { setMyShopData } from "../redux/ownerSlice";
 
 function useGetMyShop() {
   const dispatch = useDispatch();
@@ -13,8 +13,8 @@ function useGetMyShop() {
           withCredentials: true,
         });
         //set user data in redux store
-        dispatch(setUserData(result.data))
-        // console.log(result);
+        dispatch(setMyShopData(result.data))
+        
       } catch (error) {
         console.log(error)
       }

@@ -27,7 +27,7 @@ const OwnerDashboard = () => {
             </p>
             <button
               className="bg-[#ff4d2d] text-white px-5 sm:px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 transition-colors duration-200"
-              // onClick={() => navigate("/create-edit-shop")}
+              onClick={() => navigate("/create-edit-shop")}
             >
               Get Started
             </button>
@@ -47,7 +47,7 @@ const OwnerDashboard = () => {
           {/* Edit Icon */}
           <div
             className="absolute top-4 right-4 bg-[#ff4d2d] text-white p-2 rounded-full shadow-md hover:bg-orange-600 transition-colors cursor-pointer"
-            // onClick={() => navigate("/create-edit-shop")}
+            onClick={() => navigate("/create-edit-shop")}
           >
             <FaPen size={20} />
           </div>
@@ -66,7 +66,7 @@ const OwnerDashboard = () => {
                 </p>
                 <button
                   className="bg-[#ff4d2d] text-white px-5 sm:px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 transition-colors duration-200"
-                  // onClick={() => navigate("/add-item")}
+                  onClick={() => navigate("/add-item")}
                 >
                   Add Food
                 </button>
@@ -89,3 +89,4 @@ const OwnerDashboard = () => {
 };
 
 export default OwnerDashboard;
+ 
