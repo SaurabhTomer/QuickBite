@@ -8,7 +8,7 @@ const shopRouter = express.Router();
 
 
 shopRouter.post('/createShop' ,isAuth ,  createShop);
-shopRouter.post('/editShop' ,isAuth ,  editShop);
+shopRouter.patch('/editShop' ,isAuth ,  editShop);
 
 
 export default shopRouter;

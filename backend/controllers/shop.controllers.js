@@ -102,4 +102,33 @@ export const editShop = async (req, res) => {
   }
 };
 
-export const 
+export const deleteShop = async (req, res) => {
+  try {
+    //  Find the shop owned by the current user
+    const shop = await Shop.findOne({ owner: req.userId });
+
+    if (!shop) {
+      return res.status(404).json({
+        success: false,
+        message: "No shop found for this user.",
+      });
+    }
+
+
+    //  Delete the shop from the database
+    await Shop.findByIdAndDelete(shop._id);
+
+    //  Return success response
+    return res.status(200).json({
+      success: true,
+      message: "Shop deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting shop:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while deleting shop.",
+      error: error.message,
+    });
+  }
+};
