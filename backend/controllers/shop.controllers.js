@@ -1,5 +1,5 @@
-import uploadOnCloudinary from './../utils/cloudinary.js';
-import Shop from './../models/shop.models.js';
+import uploadOnCloudinary from "./../utils/cloudinary.js";
+import Shop from "./../models/shop.models.js";
 
 export const createShop = async (req, res) => {
   try {
@@ -34,7 +34,7 @@ export const createShop = async (req, res) => {
       owner: req.userId, // req.userId must be set by auth middleware
     });
 
-    //  Populate owner details 
+    //  Populate owner details
     await shop.populate("owner");
 
     // Send success response
@@ -52,7 +52,6 @@ export const createShop = async (req, res) => {
     });
   }
 };
-
 
 export const editShop = async (req, res) => {
   try {
@@ -114,7 +113,6 @@ export const deleteShop = async (req, res) => {
       });
     }
 
-
     //  Delete the shop from the database
     await Shop.findByIdAndDelete(shop._id);
 
@@ -130,5 +128,22 @@ export const deleteShop = async (req, res) => {
       message: "Server error while deleting shop.",
       error: error.message,
     });
+  }
+};
+
+
+export const getMyShop = async (req, res) => {
+  try {
+    const shop = await Shop.findOne({ onwer: req.userId }).populate("owner items")
+    if (!shop) {
+      return null;
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "shop fetched suceessfullly", shop });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: true, message: "shop fetched error", error:error.message });
   }
 };
