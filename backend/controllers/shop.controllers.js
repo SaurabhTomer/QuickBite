@@ -52,3 +52,53 @@ export const createShop = async (req, res) => {
     });
   }
 };
+
+
+export const editShop = async (req, res) => {
+  try {
+    // 1. Extract updatable fields
+    const { name, city, state, address } = req.body;
+
+    // 2. Find existing shop owned by current user
+    let shop = await Shop.findOne({ owner: req.userId });
+    if (!shop) {
+      return res.status(404).json({
+        success: false,
+        message: "No shop found for this user.",
+      });
+    }
+
+    // 3. Initialize updatedData object dynamically
+    const updatedData = {};
+    if (name) updatedData.name = name;
+    if (city) updatedData.city = city;
+    if (state) updatedData.state = state;
+    if (address) updatedData.address = address;
+
+    // 4. If a new file (image) is uploaded, update it on Cloudinary
+    if (req.file) {
+      const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+      updatedData.image = cloudinaryResponse?.url || cloudinaryResponse;
+    }
+
+    // 5. Update the shop document
+    shop = await Shop.findByIdAndUpdate(shop._id, updatedData, {
+      new: true, // return updated document
+    }).populate("owner");
+
+    // 6. Return success response
+    return res.status(200).json({
+      success: true,
+      message: "Shop updated successfully.",
+      shop,
+    });
+  } catch (error) {
+    console.error("Error editing shop:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while updating shop.",
+      error: error.message,
+    });
+  }
+};
+
