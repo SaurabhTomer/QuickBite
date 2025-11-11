@@ -11,6 +11,7 @@ import { FaPlus } from "react-icons/fa6";
 import { TbReceipt2 } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 function Navbar() {
+  //data immported from redux user slice
   const { userData, currentCity  } = useSelector(
     (state) => state.user
   );
@@ -18,16 +19,20 @@ function Navbar() {
   const [showInfo, setShowInfo] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
+  //dispatch to store data in redux store
   const dispatch = useDispatch();
+  //used ot navigate
   const navigate = useNavigate();
+  //handle logout
   const handleLogOut = async () => {
     try {
       const result = await axios.get(`${serverUrl}/api/auth/signout`, {
         withCredentials: true,
       });
-      dispatch(setUserData(null));
     } catch (error) {
       console.log(error);
+    } finally {
+      dispatch(setUserData(null));
     }
   };
 
@@ -52,7 +57,7 @@ function Navbar() {
   // }, [query]);
   return (
     <div className="w-full h-20 flex items-center justify-between md:justify-center gap-[30px] px-5 fixed top-0 z-9999 bg-[#fff9f6] overflow-visible">
-      {showSearch && userData.role == "user" && (
+      {showSearch && userData?.role == "user" && (
         <div className="w-[90%] h-[70px]  bg-white shadow-xl rounded-lg items-center gap-5 flex fixed top-20 left-[5%] md:hidden">
           <div className="flex items-center w-[30%] overflow-hidden gap-2.5 px-2.5 border-r-2 border-gray-400">
             <FaLocationDot size={25} className=" text-[#ff4d2d]" />
@@ -72,7 +77,7 @@ function Navbar() {
       )}
 
       <h1 className="text-3xl font-bold mb-2 text-[#ff4d2d]">QuickBite</h1>
-      {userData.role == "user" && (
+      {userData?.role == "user" && (
         <div className="md:w-[60%] lg:w-[40%] h-[70px] bg-white shadow-xl rounded-lg items-center gap-5 hidden md:flex">
           <div className="flex items-center w-[30%] overflow-hidden gap-2.5 px-2.5 border-r-2 border-gray-400">
             <FaLocationDot size={25} className=" text-[#ff4d2d]" />
@@ -92,7 +97,7 @@ function Navbar() {
       )}
 
       <div className="flex items-center gap-4">
-        {userData.role == "user" &&
+        {userData?.role == "user" &&
           (showSearch ? (
             <RxCross2
               size={25}
@@ -106,61 +111,11 @@ function Navbar() {
               onClick={() => setShowSearch(true)}
             />
           ))}
-        {userData.role == "owner" ? (
+        {userData?.role == "owner" ? (
           <>
-            {myShopData && (
-              <>
-                
-                <button
-                  className="hidden md:flex items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]"
-                  onClick={() => navigate("/add-item")}
-                >
-                  <FaPlus size={20} />
-                  <span>Add Food Item</span>
-                </button>
-                <button
-                  className="md:hidden flex items-center  p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]"
-                  onClick={() => navigate("/add-item")}
-                >
-                  <FaPlus size={20} />
-                </button>
-              </>
-             )} 
-
-            <div
-              className="hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium"
-              onClick={() => navigate("/my-orders")}
-            >
-              <TbReceipt2 size={20} />
-              <span>My Orders</span>
-            </div>
-            <div
-              className="md:hidden flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium"
-              onClick={() => navigate("/my-orders")}
-            >
-              <TbReceipt2 size={20} />
-            </div>
           </>
         ) : ( 
           <>
-            {userData.role == "user" && (
-              <div
-                className="relative cursor-pointer"
-                onClick={() => navigate("/cart")}
-              >
-                <FiShoppingCart size={25} className="text-[#ff4d2d]" />
-                <span className="absolute right-[-9px] -top-3 text-[#ff4d2d]">
-                  {/* {cartItems.length} */}
-                </span>
-              </div>
-            )}
-
-            <button
-              className="hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium"
-              onClick={() => navigate("/my-orders")}
-            >
-              My Orders
-            </button>
           </>
         )} 
 
@@ -168,21 +123,13 @@ function Navbar() {
           className="w-10 h-10 rounded-full flex items-center justify-center bg-[#ff4d2d] text-white text-[18px] shadow-xl font-semibold cursor-pointer"
           onClick={() => setShowInfo((prev) => !prev)}
         >
-          {userData?.fullName.slice(0, 1)}
+          {userData?.fullName?.slice(0, 1) || ""}
         </div>
         {showInfo && (
           <div
             className={`fixed top-20 right-2.5 md:right-[10%] lg:right-[25%] w-[180px] bg-white shadow-2xl rounded-xl p-5 flex flex-col gap-2.5 z-9999`}
           >
-            <div className="text-[17px] font-semibold">{userData.fullName}</div>
-            {userData.role == "user" && (
-              <div
-                className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer"
-                onClick={() => navigate("/my-orders")}
-              >
-                My Orders
-              </div>
-            )}
+            <div className="text-[17px] font-semibold">{userData?.fullName}</div>
 
             <div
               className="text-[#ff4d2d] font-semibold cursor-pointer"

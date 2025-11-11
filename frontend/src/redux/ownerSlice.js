@@ -9,7 +9,7 @@ const ownerSlice = createSlice({
     //reducres used to set initialState data
     reducers:{
         setMyShopData:(state , action) => {
-            state.userData = action.payload
+            state.myShopData = action.payload
         },
     }
 })

@@ -52,7 +52,7 @@ function App() {
       />
        <Route
         path="/create-edit-shop"
-        element={!userData ? <CreateEditShop /> : <Navigate to={"/signin"} />}
+        element={userData ? <CreateEditShop /> : <Navigate to={"/signin"} />}
       />
     </Routes>
   );

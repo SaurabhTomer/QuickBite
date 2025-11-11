@@ -7,12 +7,14 @@ import { useState } from "react";
 function CreateEditShop() {
     const navigate = useNavigate();
     const { myShopData } = useSelector(state => state.owner)
+    const { currentCity , currentState , currentAddress} = useSelector(state => state.user)
 
+    //shop details state
     const [name,setName] = useState(myShopData?.name || "")
-    const [address,setAddress] = useState(myShopData?.address || "")
-    const [city,setCity] = useState(myShopData?.city || "")
-    const [state,setState] = useState(myShopData?.state || "")
-    // const [name,setName] = useState(myShopData.name || "")
+    const [address,setAddress] = useState(myShopData?.address || currentAddress)
+    const [city,setCity] = useState(myShopData?.city || currentCity)
+    const [state,setState] = useState(myShopData?.state || currentState)
+   
 
     return (
         <div
@@ -47,14 +49,17 @@ function CreateEditShop() {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                         <input type="text" placeholder="Enter Shop Name" 
                         className="w-full px-4 py-2 border rounded-lg 
-                        focus:outline-none focus:ring-2 focus:ring-orange-500"/>
+                        focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        onChange={(e) => setName(e.target.value)}
+                        value={(name)}/>
                     </div>
                     {/* Shop Image */}
                      <div> 
                         <label className="block text-sm font-medium text-gray-700 mb-1">Shop Image</label>
                         <input type="file"  accept="image/*"
                         className="w-full px-4 py-2 border rounded-lg 
-                        focus:outline-none focus:ring-2 focus:ring-orange-500"/>
+                        focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      />
                     </div>
 
                     {/* City and state  */}
@@ -64,14 +69,18 @@ function CreateEditShop() {
                         <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                         <input type="text" placeholder="Enter City" 
                         className="w-full px-4 py-2 border rounded-lg 
-                        focus:outline-none focus:ring-2 focus:ring-orange-500"/>
+                        focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        onChange={(e) => setCity(e.target.value)}
+                        value={(city)}/>
                     </div>
 
                      <div> 
                         <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
                         <input type="text" placeholder="Enter State" 
                         className="w-full px-4 py-2 border rounded-lg 
-                        focus:outline-none focus:ring-2 focus:ring-orange-500"/>
+                        focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        onChange={(e) => setState(e.target.value)}
+                        value={(state)}/>
                     </div>
 
                     </div>
@@ -80,7 +89,9 @@ function CreateEditShop() {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                         <input type="text" placeholder="Enter shop Address" 
                         className="w-full px-4 py-2 border rounded-lg 
-                        focus:outline-none focus:ring-2 focus:ring-orange-500"/>
+                        focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        onChange={(e) => setAddress(e.target.value)}
+                        value={(address)}/>
                     </div>
 
                     <button className="w-full bg-[#ff4d2d] text-white px-6 py-3 rounded-lg font-semibold shadow-md

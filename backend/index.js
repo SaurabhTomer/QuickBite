@@ -10,7 +10,7 @@ import shopRouter from './routes/shop.routes.js';
 import itemRouter from './routes/item.routes.js';
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 
 //global middlware to parse data in json format
 app.use(express.json());

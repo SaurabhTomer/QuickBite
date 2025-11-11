@@ -1,17 +1,15 @@
-
-import Navbar from "./Navbar";
 import { useSelector } from "react-redux";
 import { FaUtensils, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import useGetMyShop from "../hooks/useGetMyShop";
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  useGetMyShop();
 
   return (
     <div className="w-full min-h-screen bg-[#fff9f6] flex flex-col items-center">
-      {/* Navbar */}
-      <Navbar />
 
       {/* Add Restaurant Section */}
       <div className="flex justify-center items-center p-4 sm:p-6">

@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import axios from "axios";
-import { setCity } from "../redux/userSlice";
+import { setAddress, setCity, setState } from "../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 
@@ -21,10 +21,15 @@ function useGetCity() {
       );
       // console.log(result)
       const city = result?.data?.results[0]?.city;
+      const state = result?.data?.results[0]?.state;
+      const address = (result?.data?.results[0]?.address_line2 || result?.data?.results[0]?.address_line1) ;
     //   console.log(city);
 
    //set in redux 
     dispatch(setCity(city))
+    dispatch(setState(state))
+    dispatch(setAddress(address))
+
     });
     
   } , [userData]);

@@ -12,11 +12,12 @@ function useGetMyShop() {
         const result = await axios.get(`${serverUrl}/api/shop/getmyshop`, {
           withCredentials: true,
         });
-        //set user data in redux store
-        dispatch(setMyShopData(result.data))
+        // set shop data in redux store
+        dispatch(setMyShopData(result.data?.shop ?? null))
         
       } catch (error) {
-        console.log(error)
+        console.log(error);
+        dispatch(setMyShopData(null));
       }
     };
     fetchShop()
