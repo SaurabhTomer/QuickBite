@@ -45,10 +45,17 @@ const userSlice = createSlice({
             else{
                 state.cartItems.push(cartItem)
             }
+        },
+        updateQuantity:(state , action) => {
+            const {id , quantity} = action.payload
+            const item = state.cartItems.find( i => i.id == id)
+            if(item){
+                item.quantity  = quantity
+            }
         }
        
     }
 })
 
-export const {setUserData , setCurrentCity , setCurrentState , setCurrentAddress , setShopInMyCity ,setItemsInMyCity } = userSlice.actions;
+export const {setUserData , setCurrentCity , setCurrentState , setCurrentAddress , setShopInMyCity ,setItemsInMyCity , updateQuantity } = userSlice.actions;
 export default userSlice.reducer
