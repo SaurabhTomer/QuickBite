@@ -3,6 +3,7 @@ import { FaPlus } from "react-icons/fa";
 import { CiTrash } from "react-icons/ci";
 import { useDispatch } from "react-redux";
 import { removeCartItem, updateQuantity } from "../redux/userSlice";
+
 function CartItemCard({ data }) {
   //hook to get data in redux store
   const dispatch = useDispatch();
@@ -11,12 +12,14 @@ function CartItemCard({ data }) {
   const handleIncrease = (id, currentQty) => {
     dispatch(updateQuantity({ id, quantity: currentQty + 1 }));
   };
+
    // function to decrease  quantity
   const handleDecrease = (id, currentQty) => {
     if (currentQty > 1) {
       dispatch(updateQuantity({ id, quantity: currentQty - 1 }));
     }
   };
+
   return (
     <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow border">
 
@@ -51,6 +54,7 @@ function CartItemCard({ data }) {
         >
           <FaMinus size={12} />
         </button>
+        {/* to  show quantity */}
         <span>{data.quantity}</span>
           {/* button to increase quantity */}
         <button
