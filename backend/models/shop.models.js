@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
-const shopSchema = new mongoose.Schema({
+const shopSchema=new mongoose.Schema({
     name:{
         type:String,
         required:true
@@ -12,27 +12,26 @@ const shopSchema = new mongoose.Schema({
     owner:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
-        required:true,
+        required:true
     },
     city:{
          type:String,
         required:true
     },
-     state:{
+    state:{
          type:String,
         required:true
     },
     address:{
         type:String,
-        required:true,
+        required:true
     },
     items:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Item"
     }]
 
-} , {timestamps:true})
+},{timestamps:true})
 
-
-const Shop = mongoose.model("Shop" , shopSchema)
+const Shop=mongoose.model("Shop",shopSchema)
 export default Shop
