@@ -4,8 +4,9 @@ import { IoSearchOutline } from "react-icons/io5";
 import { TbCurrentLocation } from "react-icons/tb";
 import { IoLocationSharp } from "react-icons/io5";
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
-import { useDispatch, useSelector } from "react-redux";
+//import css file from leaflet 
 import "leaflet/dist/leaflet.css";
+import { useDispatch, useSelector } from "react-redux";
 import { setAddress, setLocation } from "../redux/mapSlice";
 import { MdDeliveryDining } from "react-icons/md";
 import { FaCreditCard } from "react-icons/fa";
@@ -23,21 +24,30 @@ function RecenterMap({ location }) {
 }
 
 function CheckOut() {
-  //   const { location, address } = useSelector(state => state.map)
-  //     const { cartItems ,totalAmount,userData} = useSelector(state => state.user)
-  //   const [addressInput, setAddressInput] = useState("")
+    // took data from redux store
+    const { location, address } = useSelector(state => state.map)
+    const { cartItems ,totalAmount,userData} = useSelector(state => state.user)
+
+    // state to set address on checkout page
+    const [addressInput, setAddressInput] = useState("")
   //   const [paymentMethod, setPaymentMethod] = useState("cod")
-  //   const navigate=useNavigate()
-  //   const dispatch = useDispatch()
+  //import hooks
+    const navigate=useNavigate()
+    const dispatch = useDispatch()
   //   const apiKey = import.meta.env.VITE_GEOAPIKEY
   //   const deliveryFee=totalAmount>500?0:40
   //   const AmountWithDeliveryFee=totalAmount+deliveryFee
 
-  //   const onDragEnd = (e) => {
-  //     const { lat, lng } = e.target._latlng
-  //     dispatch(setLocation({ lat, lon: lng }))
-  //     getAddressByLatLng(lat, lng)
-  //   }
+
+  //function to handle loaction change while we move drager on map
+    const onDragEnd = (e) => {
+        // on this event we get lat and long on target k andr latlng mai
+      const { lat, lng } = e.target._latlng
+      // update data in redux store after move dragger 
+      dispatch(setLocation({ lat, lon: lng }))
+      getAddressByLatLng(lat, lng)
+    }
+
   //   const getCurrentLocation = () => {
   //       const latitude=userData.location.coordinates[1]
   //       const longitude=userData.location.coordinates[0]
@@ -121,9 +131,10 @@ function CheckOut() {
 
   // }
 
-  //   useEffect(() => {
-  //     setAddressInput(address)
-  //   }, [address])
+  //  runs when ever address changes
+    useEffect(() => {
+      setAddressInput(address)
+    }, [address])
 
   return (
     <div className="min-h-screen bg-[#fff9f6] flex items-center justify-center p-6">
@@ -140,13 +151,13 @@ function CheckOut() {
         <h1 className="text-2xl font-bold text-gray-800">Checkout</h1>
 
         <section>
-          <h2 className="text-lg font-semibold mb-2 flex items-center gap-2 text-gray-800">
             {/* location icon  */}
+          <h2 className="text-lg font-semibold mb-2 flex items-center gap-2 text-gray-800">
             <IoLocationSharp className="text-[#ff4d2d]" /> Delivery Location
           </h2>
 
-          <div className="flex gap-2 mb-3">
             {/* delivery address */}
+          <div className="flex gap-2 mb-3">
             <input
               type="text"
               className="flex-1 border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff4d2d]"
@@ -173,9 +184,12 @@ function CheckOut() {
 
         {/* map */}
           <div className="rounded-xl border overflow-hidden">
+
             <div className="h-64 w-full flex items-center justify-center">
               <MapContainer
                 className={"w-full h-full"}
+                // location comes from redux
+                // this shows the map (location street)
                 center={[location?.lat, location?.lon]}
                 zoom={16}
               >
@@ -185,12 +199,16 @@ function CheckOut() {
                 />
                 <RecenterMap location={location} />
                 <Marker
+                //this marks the exact location of user
                   position={[location?.lat, location?.lon]}
+                  // through this we can move marker 
                   draggable
+                  // this changes actual location when we actuallly drag marker
                   eventHandlers={{ dragend: onDragEnd }}
                 />
               </MapContainer>
             </div>
+
           </div>
         </section>
 
