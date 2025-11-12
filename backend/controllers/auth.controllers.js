@@ -1,306 +1,157 @@
-import User from "../models/user.models.js";
-import bcrypt from "bcryptjs";
-import { genToken } from "../utils/token.js";
-import { sendotpMail } from "../utils/mail.js";
+import User from "../models/user.model.js"
+import bcrypt, { hash } from "bcryptjs"
+import genToken from "../utils/token.js"
+import { sendOtpMail } from "../utils/mail.js"
+export const signUp=async (req,res) => {
+    try {
+        const {fullName,email,password,mobile,role}=req.body
+        let user=await User.findOne({email})
+        if(user){
+            return res.status(400).json({message:"User Already exist."})
+        }
+        if(password.length<6){
+            return res.status(400).json({message:"password must be at least 6 characters."})
+        }
+        if(mobile.length<10){
+            return res.status(400).json({message:"mobile no must be at least 10 digits."})
+        }
+     
+        const hashedPassword=await bcrypt.hash(password,10)
+        user=await User.create({
+            fullName,
+            email,
+            role,
+            mobile,
+            password:hashedPassword
+        })
 
-export const signUp = async (req, res) => {
+        const token=await genToken(user._id)
+        res.cookie("token",token,{
+            secure:false,
+            sameSite:"strict",
+            maxAge:7*24*60*60*1000,
+            httpOnly:true
+        })
+  
+        return res.status(201).json(user)
+
+    } catch (error) {
+        return res.status(500).json(`sign up error ${error}`)
+    }
+}
+
+export const signIn=async (req,res) => {
+    try {
+        const {email,password}=req.body
+        const user=await User.findOne({email})
+        if(!user){
+            return res.status(400).json({message:"User does not exist."})
+        }
+        
+     const isMatch=await bcrypt.compare(password,user.password)
+     if(!isMatch){
+         return res.status(400).json({message:"incorrect Password"})
+     }
+
+        const token=await genToken(user._id)
+        res.cookie("token",token,{
+            secure:false,
+            sameSite:"strict",
+            maxAge:7*24*60*60*1000,
+            httpOnly:true
+        })
+  
+        return res.status(200).json(user)
+
+    } catch (error) {
+        return res.status(500).json(`sign In error ${error}`)
+    }
+}
+
+export const signOut=async (req,res) => {
+    try {
+        res.clearCookie("token")
+return res.status(200).json({message:"log out successfully"})
+    } catch (error) {
+        return res.status(500).json(`sign out error ${error}`)
+    }
+}
+
+export const sendOtp=async (req,res) => {
   try {
-    const { fullName, email, mobile, role, password } = req.body;
-
-    // validate required fields
-    if (!fullName || !email || !mobile || !role || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
+    const {email}=req.body
+    const user=await User.findOne({email})
+    if(!user){
+       return res.status(400).json({message:"User does not exist."})
     }
-
-    // check if user already exists
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({
-        success: false,
-        message: "User already exists with this email",
-      });
-    }
-
-    // check password length
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters long",
-      });
-    }
-
-    // check mobile length
-    if (mobile.length !== 10) {
-      return res.status(400).json({
-        success: false,
-        message: "Mobile number must be exactly 10 digits",
-      });
-    }
-
-    // hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // create user
-    user = await User.create({
-      fullName,
-      email,
-      mobile,
-      role,
-      password: hashedPassword,
-    });
-
-    // generate token
-    const token = await genToken(user._id);
-
-    // set cookie
-    res.cookie("token", token, {
-      secure: false, // use true in production with HTTPS
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      user,
-    });
+    const otp=Math.floor(1000 + Math.random() * 9000).toString()
+    user.resetOtp=otp
+    user.otpExpires=Date.now()+5*60*1000
+    user.isOtpVerified=false
+    await user.save()
+    await sendOtpMail(email,otp)
+    return res.status(200).json({message:"otp sent successfully"})
   } catch (error) {
-    console.error("Signup Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Signup failed, please try again later",
-    });
-  }
-};
+     return res.status(500).json(`send otp error ${error}`)
+  }  
+}
 
-export const signIn = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Validate input
-    if (!email ) {
-      return res.status(400).json({
-        success: false,
-        message: "Email  is required",
-      });
+export const verifyOtp=async (req,res) => {
+    try {
+        const {email,otp}=req.body
+        const user=await User.findOne({email})
+        if(!user || user.resetOtp!=otp || user.otpExpires<Date.now()){
+            return res.status(400).json({message:"invalid/expired otp"})
+        }
+        user.isOtpVerified=true
+        user.resetOtp=undefined
+        user.otpExpires=undefined
+        await user.save()
+        return res.status(200).json({message:"otp verify successfully"})
+    } catch (error) {
+         return res.status(500).json(`verify otp error ${error}`)
     }
-     // Validate input
-    if (!password ) {
-      return res.status(400).json({
-        success: false,
-        message: "Password  is required",
-      });
+}
+
+export const resetPassword=async (req,res) => {
+    try {
+        const {email,newPassword}=req.body
+        const user=await User.findOne({email})
+    if(!user || !user.isOtpVerified){
+       return res.status(400).json({message:"otp verification required"})
     }
-
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User does not exist",
-      });
+    const hashedPassword=await bcrypt.hash(newPassword,10)
+    user.password=hashedPassword
+    user.isOtpVerified=false
+    await user.save()
+     return res.status(200).json({message:"password reset successfully"})
+    } catch (error) {
+         return res.status(500).json(`reset password error ${error}`)
     }
+}
 
-    // Compare password
-    const isMatched = await bcrypt.compare(password, user.password);
-    if (!isMatched) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid password",
-      });
+export const googleAuth=async (req,res) => {
+    try {
+        const {fullName,email,mobile,role}=req.body
+        let user=await User.findOne({email})
+        if(!user){
+            user=await User.create({
+                fullName,email,mobile,role
+            })
+        }
+
+        const token=await genToken(user._id)
+        res.cookie("token",token,{
+            secure:false,
+            sameSite:"strict",
+            maxAge:7*24*60*60*1000,
+            httpOnly:true
+        })
+  
+        return res.status(200).json(user)
+
+
+    } catch (error) {
+         return res.status(500).json(`googleAuth error ${error}`)
     }
-
-    // Generate token
-    const token = await genToken(user._id);
-
-    // Set cookie
-    res.cookie("token", token, {
-      secure: false, // use true in production (with HTTPS)
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Login successful",
-    });
-  } catch (error) {
-    console.error("SignIn Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "SignIn failed, please try again later",
-    });
-  }
-};
-
-export const signOut = async (req, res) => {
-  try {
-    res.clearCookie("token");
-    return res.status(200).json({ message: "logout successfully" });
-  } catch (error) {
-    console.error("Signout Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Signout failed, please try again later",
-    });
-  }
-};
-
-export const sendOtp = async (req, res) => {
-  try {
-    //fetch email from body
-    const { email } = req.body;
-    //vaidate email
-    if (!email) {
-      return res.status(400).json({ message: "send email" });
-    }
-    //check user exist or not
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "User does not exists" });
-    }
-    //generate otp
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    //save generated otp in user  details
-    user.resetOtp = otp;
-    user.otpExpires = Date.now() + 5 * 60 * 1000;
-    user.isOtpverified = false;
-    //save user
-    await user.save();
-
-    //send mail
-    await sendotpMail(user.email, otp);
-
-    return res.status(200).json({ message: "otp send successfully" });
-  } catch (error) {
-    // console.log("otp send error");
-    return res.status(500).json(`send otp error ${error}`);
-  }
-};
-
-export const verifyOtp = async (req, res) => {
-  try {
-    //fetch email , otp from body
-    const { email, otp } = req.body;
-
-    //check user exist or not
-    const user = await User.findOne({ email });
-
-    if (!user || user.resetOtp != otp || user.otpExpires < Date.now()) {
-      return res.status(400).json({ message: "Invalid / Expired Otp" });
-    }
-
-    //updating  condition after checking condition
-    user.isOtpverified = true;
-    user.resetOtp = undefined;
-    user.otpExpires = undefined;
-
-    //save user with modified details
-    await user.save();
-
-    return res.status(200).json({ message: "otp verify successfully" });
-  } catch (error) {
-    return res.status(500).json(`verify otp error ${error}`);
-  }
-};
-
-
-export const resetPassword = async (req, res) => {
-  try {
-    // Fetch data
-    const { email, newPassword, confirmPassword } = req.body;
-
-    // Validate input
-    if (!email || !newPassword || !confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Email, new password, and confirm password are required",
-      });
-    }
-
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Passwords do not match",
-      });
-    }
-
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    // Check if OTP is verified (optional)
-    if (!user.isOtpVerified) {
-      return res.status(400).json({
-        success: false,
-        message: "OTP verification required before resetting password",
-      });
-    }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-
-    // Reset OTP status
-    user.isOtpVerified = false;
-
-    // Save user
-    await user.save();
-
-    return res.status(200).json({
-      success: true,
-      message: "Password reset successfully",
-    });
-  } catch (error) {
-    console.error("Reset password error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Server error while resetting password",
-      error: error.message,
-    });
-  }
-};
-
-
-export const googleAuth = async (req, res) => {
-  try {
-    //fetch data fromm body
-    const { fullName, email, mobile  , role} = req.body;
-    //find user in db
-    let user = await User.findOne({ email });
-
-    //if not found then create with this details
-    if (!user) {
-      user = await User.create({
-        fullName,
-        email,
-        mobile,
-        role
-      });
-    }
-    //generate token if user is created or if user is already present thn user id is already with it
-    const token = genToken(user._id);
-    //save token in cookie
-    res.cookie("token", token, {
-      secure: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
-    //return user
-
-    return res.status(200).json(user);
-  } catch (error) {
-    return res.status(500).json(`google auth error ${error}`);
-  }
-};
+}
