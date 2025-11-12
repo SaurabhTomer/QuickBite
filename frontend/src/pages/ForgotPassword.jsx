@@ -1,255 +1,133 @@
-import React, { useState } from "react";
+import axios from 'axios';
+import React, { useState } from 'react'
 import { IoIosArrowRoundBack } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { serverUrl } from "../App";
-import { ClipLoader } from 'react-spinners'
+import { useNavigate } from 'react-router-dom';
+import { serverUrl } from '../App';
+import { ClipLoader } from 'react-spinners';
+
 
 function ForgotPassword() {
-  const navigate = useNavigate();
+  const [step, setStep] = useState(1)
+  const [email, setEmail] = useState("")
+  const [otp, setOtp] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [err, setErr] = useState("")
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
 
-  const [step, setStep] = useState(1); //state for steps
-  //states for user entered fields
-  const [email, setEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState("");
-
-  //state to show error
-  const [error, setError] = useState("");
-
-    //to show loading icon
-    const [loading , setLoading] = useState(false);
-
-  //handle send otp functionality
+  //function to send otp
   const handleSendOtp = async () => {
-       setLoading(true);
+    setLoading(true)
     try {
-      const result = await axios.post(
-        `${serverUrl}/api/auth/send-otp`,
-        { email },
-        { withCredentials: true }
-      );
-      // console.log(result);
-      // necessary to move to move to next page
-      setStep(2);
-         setLoading(false);
-
-      setError("");
+      const result = await axios.post(`${serverUrl}/api/auth/send-otp`, { email }, { withCredentials: true })
+      console.log(result)
+      setErr("")
+      setStep(2)
+      setLoading(false)
     } catch (error) {
-         setLoading(false);
-      // console.log(error);
-      return setError(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          "something went wrong"
-      );
+      setErr(error.response.data.message)
+      setLoading(false)
     }
-  };
+  }
 
-  //handle verify otp
+  //function to verify otp
   const handleVerifyOtp = async () => {
-       setLoading(true);
+    setLoading(true)
     try {
-      const result = await axios.post(
-        `${serverUrl}/api/auth/verify-otp`,
-        { email, otp },
-        { withCredentials: true }
-      );
-      // console.log(result);
-      // necessary to move to move to next page
-      setStep(3);
-         setLoading(false);
-
-      setError("");
+      const result = await axios.post(`${serverUrl}/api/auth/verify-otp`, { email, otp }, { withCredentials: true })
+      console.log(result)
+      setErr("")
+      setStep(3)
+      setLoading(false)
     } catch (error) {
-       setLoading(false);
-      // console.log(error);
-      return setError(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          "something went wrong"
-      );
+      setErr(error?.response?.data?.message)
+      setLoading(false)
     }
-  };
+  }
 
-  //handle reset password
-  const handleReset = async () => {
+  //function to reset password
+  const handleResetPassword = async () => {
     if (newPassword != confirmPassword) {
-      return setError(
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "something went wrong"
-      );
-
-     
-    } 
-     setLoading(true); 
-      try {
-        const result = await axios.post(
-          `${serverUrl}/api/auth/reset-password`,
-          { email, newPassword },
-          { withCredentials: true }
-        );
-        // console.log(result.data);
-        setError("");
-         setLoading(false);
-        // necessary to move to move to next page
-        navigate("/signin");
-      } catch (error) {
-         setLoading(false);
-        // console.log(error);
-        return setError(
-          error.response?.data?.message ||
-            error.response?.data?.error ||
-            "something went wrong"
-        );
-      }
-    
-  };
+      return null
+    }
+    setLoading(true)
+    try {
+      const result = await axios.post(`${serverUrl}/api/auth/reset-password`, { email, newPassword }, { withCredentials: true })
+      setErr("")
+      console.log(result)
+      setLoading(false)
+      navigate("/signin")
+    } catch (error) {
+      setErr(error?.response?.data?.message)
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="flex items-center justify-center w-full min-h-screen p-4 bg-[#fff9f6]">
-      {/* forgot password heading */}
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-8">
-        <div className="flex items-center gap-4 mb-4 cursor-pointer">
-          <IoIosArrowRoundBack
-            className="text-[#ff4d2d] "
-            size={30}
-            onClick={() => navigate("/signin")}
-          />
-          <h1 className="text-2xl font-bold text-center text-[#ff4d2d]">
-            Forgot Password
-          </h1>
+    <div className='flex w-full items-center justify-center min-h-screen p-4 bg-[#fff9f6]'>
+      <div className='bg-white rounded-xl shadow-lg w-full max-w-md p-8'>
+        <div className='flex items-center  gap-4 mb-4'>
+          <IoIosArrowRoundBack size={30} className='text-[#ff4d2d] cursor-pointer' onClick={() => navigate("/signin")} />
+          <h1 className='text-2xl font-bold text-center text-[#ff4d2d]'>Forgot Password</h1>
         </div>
-
-        {/* perform 3 pages using step idea  */}
-        {step == 1 && (
+        {step == 1
+          &&
           <div>
-            {/* email */}
-            <div className="mb-6">
-              <label
-                htmlFor="email"
-                className="block text-gray-700  font-medium mb-1"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                className="w-full  border border-gray-200 rounded-lg px-3 py-2 focus:outline-none"
-                placeholder="Enter Your Email"
+            <div className='mb-6'>
+              <label htmlFor="email" className='block text-gray-700 font-medium mb-1'>Email</label>
+              <input type="email" className='w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none  '
+                placeholder='Enter your Email'
                 onChange={(e) => setEmail(e.target.value)}
-                value={email}
-                required
-              />
-            </div>
-            {/*  send otp button */}
-            <button
-              className={
-                "w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
-              }
-              onClick={handleSendOtp}
-               //work when loadind is true disbale the button
-          disabled={loading}
-            >
-              {loading ? <ClipLoader size={20} color="white" /> : "Send OTP"}
-            </button>
-            {/* Show error message if any */}
-            <p className="text-red-500 text-center my-2.5"> {error} </p>
-          </div>
-        )}
+                value={email} required />
 
-        {/* step 2 */}
-        {step == 2 && (
+            </div>
+            <button className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`} 
+            onClick={handleSendOtp} 
+            disabled={loading}>
+              {/* this load after we click on button */}
+              {loading ? <ClipLoader size={20} color='white' /> : "Send Otp"}
+            </button>
+            {err && <p className='text-red-500 text-center my-2.5'>*{err}</p>}
+          </div>}
+
+        {step == 2
+          &&
           <div>
-            {/* enter otp */}
-            <div className="mb-6">
-              <label
-                htmlFor="OTP"
-                className="block text-gray-700  font-medium mb-1"
-              >
-                OTP
-              </label>
-              <input
-                type="text"
-                className="w-full  border border-gray-200 rounded-lg px-3 py-2 focus:outline-none"
-                placeholder="Enter OTP "
-                onChange={(e) => setOtp(e.target.value)}
-                value={otp}
-                required
-              />
+            <div className='mb-6'>
+              <label htmlFor="email" className='block text-gray-700 font-medium mb-1'>OTP</label>
+              <input type="email" className='w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none  ' 
+              placeholder='Enter OTP' onChange={(e) => setOtp(e.target.value)} value={otp} required />
             </div>
-            {/*  verify button */}
-            <button
-              className={
-                "w-full font-semibold pointer-cursor text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
-              }
-              onClick={handleVerifyOtp}
-               //work when loadind is true disbale the button
-          disabled={loading}
-            >
-               {loading ? <ClipLoader size={20} color="white" /> : "Verify OTP"}
+            <button className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
+             onClick={handleVerifyOtp} disabled={loading}>
+              {loading ? <ClipLoader size={20} color='white' /> : "Verify"}
             </button>
-            {/* Show error message if any */}
-            <p className="text-red-500 text-center my-2.5"> {error} </p>
-          </div>
-        )}
+            {err && <p className='text-red-500 text-center my-2.5'>*{err}</p>}
+          </div>}
 
-        {/* step 3 */}
-        {step == 3 && (
+        {step == 3
+          &&
           <div>
-            {/* new password */}
-            <div className="mb-6">
-              <label
-                htmlFor="newPassword"
-                className="block text-gray-700  font-medium mb-1"
-              >
-                New Password
-              </label>
-              <input
-                type="password"
-                className="w-full  border border-gray-200 rounded-lg px-3 py-2 focus:outline-none"
-                placeholder=" New Password "
-                onChange={(e) => setNewPassword(e.target.value)}
-                value={newPassword}
-              />
+            <div className='mb-6'>
+              <label htmlFor="newPassword" className='block text-gray-700 font-medium mb-1'>New Password</label>
+              <input type="email" className='w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none  ' 
+              placeholder='Enter New Password' onChange={(e) => setNewPassword(e.target.value)} value={newPassword} />
             </div>
-
-            {/* confirm password */}
-            <div className="mb-6">
-              <label
-                htmlFor="confirmPassword"
-                className="block text-gray-700  font-medium mb-1"
-              >
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                className="w-full  border border-gray-200 rounded-lg px-3 py-2 focus:outline-none"
-                placeholder=" Confirm Password "
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                value={confirmPassword}
-              />
+            <div className='mb-6'>
+              <label htmlFor="ConfirmPassword" className='block text-gray-700 font-medium mb-1'>Confirm Password</label>
+              <input type="email" className='w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none  ' 
+              placeholder='Confirm Password' onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} required />
             </div>
-            {/*  password button */}
-            <button
-              className={
-                "w-full font-semibold cursor-pointer text-center bg-[#ff4d2d] text-white hover:bg-[#e64323] py-2 rounded-lg "
-              }
-              onClick={handleReset}
-               //work when loadind is true disbale the button
-          disabled={loading}
-            >
-                 {loading ? <ClipLoader size={20} color="white" /> : "Reset Password"}
+            <button className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
+             onClick={handleResetPassword} disabled={loading}>
+              {loading ? <ClipLoader size={20} color='white' /> : "Reset Password"}
             </button>
-
-            {/* Show error message if any */}
-            <p className="text-red-500 text-center my-2.5"> {error} </p>
-          </div>
-        )}
+            {err && <p className='text-red-500 text-center my-2.5'>*{err}</p>}
+          </div>}
       </div>
     </div>
-  );
+  )
 }
 
-export default ForgotPassword;
+export default ForgotPassword
